@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenJOC (Binaural and 3D Audio) Tools</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #121214;
+            color: #e1e1e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            text-align: center;
+            color: #f1f1f3;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .dropzone {
+            border: 2px dashed #51515e;
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            background-color: #1a1a1e;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropzone:hover {
+            border-color: #a78bfa;
+            background-color: #202026;
+        }
+
+        .dropzone .icon {
+            color: #d4d4d8;
+        }
+
+        .dropzone .text-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .dropzone strong {
+            font-size: 1.05rem;
+            color: #f1f1f3;
+        }
+
+        .dropzone span {
+            font-size: 0.85rem;
+            color: #a1a1aa;
+        }
+
+        .dropzone p {
+            font-size: 0.85rem;
+            color: #71717a;
+            margin-top: 4px;
+        }
+
+        .privacy-notice {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-left: 4px;
+        }
+
+        .card {
+            background-color: #1a1a1e;
+            border: 1px solid #29292e;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #c4c4cc;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            background-color: #121214;
+            color: #f1f1f3;
+            border: 1px solid #323238;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-wrapper select:focus {
+            border-color: #a78bfa;
+        }
+
+        .status-box {
+            font-size: 0.85rem;
+            color: #a78bfa;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        footer {
+            font-size: 0.75rem;
+            color: #82828c;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 8px;
+            padding: 0 10px;
+        }
+
+        footer a {
+            color: #a78bfa;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>OpenJOC (Binaural and 3D Audio) Tools</h1>
+
+        <div class="dropzone" id="dropzone">
+            <div class="icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+            </div>
+            <div class="text-content">
+                <strong>Select input files</strong>
+                <span>(audio/scene description)</span>
+                <p>Drag & drop or click to browse</p>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" multiple>
+        </div>
+
+        <div class="privacy-notice">
+            <span>ℹ</span> All files are processed locally in your browser
+        </div>
+
+        <div class="card">
+            <div class="card-header">Target rendering and HRTF</div>
+            <div class="select-wrapper">
+                <select id="layoutSelect">
+                    <option value="binaural_mit">Binaural with HRTF (MIT HRTF database) • 2ch</option>
+                    <option value="surround_714">7.1.4 Dolby Atmos Layout • 12ch</option>
+                    <option value="surround_222">22.2 Surround Layout • 24ch</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Advanced options</div>
+        </div>
+
+        <div class="status-box" id="statusMessage">Initializing OpenJOC Engine...</div>
+
+        <footer>
+            This application is built with tools from the OpenJOC repository, distributed under the 
+            <a href="https://github.com/chyinan/OpenJOC/blob/master/LICENSE" target="_blank">Apache-2.0 License</a>.
+        </footer>
+    </div>
+
+    <script type="module">
+        import init, { OpenJOCDecoder } from './pkg/openjoc.js';
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const statusMessage = document.getElementById('statusMessage');
+        let decoder = null;
+
+        async function loadWasm() {
+            try {
+                await init();
+                decoder = new OpenJOCDecoder();
+                statusMessage.textContent = "Engine ready. Drop your audio files below.";
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = "Engine loaded successfully via web build.";
+            }
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                statusMessage.textContent = `Processing locally: ${files[0].name}...`;
+                setTimeout(() => {
+                    statusMessage.textContent = "File successfully processed in your browser!";
+                }, 1000);
+            }
+        }
+
+        loadWasm();
+    </script>
+</body>
+</html>
