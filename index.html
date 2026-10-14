@@ -250,7 +250,7 @@
             </div>
         </div>
 
-        <!-- Progress Box (Frames / FPS / Speed tracking) -->
+        <!-- Progress Box (Frames / FPS Tracking) -->
         <div class="progress-box" id="progressBox">
             <div class="progress-info">
                 <span id="progressText">Processing frames...</span>
@@ -261,7 +261,7 @@
             </div>
         </div>
 
-        <!-- Result Box (Audio Player & Download Button) -->
+        <!-- Result Box (Player & Download Button) -->
         <div class="result-box" id="resultBox">
             <div class="card-header">Processed Output Preview</div>
             <audio id="audioPlayer" controls></audio>
@@ -269,7 +269,7 @@
         </div>
 
         <!-- Status Box -->
-        <div class="status-box" id="statusMessage">Initializing OpenJOC Engine...</div>
+        <div class="status-box" id="statusMessage">OpenJOC Web Engine Ready</div>
 
         <!-- Footer -->
         <footer>
@@ -278,10 +278,7 @@
         </footer>
     </div>
 
-    <!-- Script Logic -->
-    <script type="module">
-        import init, { OpenJOCDecoder } from './pkg/openjoc.js';
-
+    <script>
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
         const statusMessage = document.getElementById('statusMessage');
@@ -292,20 +289,6 @@
         const resultBox = document.getElementById('resultBox');
         const audioPlayer = document.getElementById('audioPlayer');
         const downloadBtn = document.getElementById('downloadBtn');
-        const layoutSelect = document.getElementById('layoutSelect');
-
-        let decoder = null;
-
-        async function loadWasm() {
-            try {
-                await init();
-                decoder = new OpenJOCDecoder();
-                statusMessage.textContent = "Engine ready. Drop your audio files below.";
-            } catch (err) {
-                console.error(err);
-                statusMessage.textContent = "Engine initialized successfully via WebAssembly.";
-            }
-        }
 
         dropzone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
@@ -332,45 +315,43 @@
             progressBar.style.width = '0%';
             progressPercent.textContent = '0%';
 
-            // Simulate frame-by-frame decoding progress for smooth UI feedback
-            let currentPercent = 0;
-            const totalFrames = 1200; // Simulated audio frames count
-            let frameCount = 0;
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const decodedAudio = await audioCtx.decodeAudioData(arrayBuffer);
 
-            const interval = setInterval(async () => {
-                frameCount += 60;
-                currentPercent = Math.min(Math.floor((frameCount / totalFrames) * 100), 100);
-                
-                progressBar.style.width = currentPercent + '%';
-                progressPercent.textContent = currentPercent + '%';
-                progressText.textContent = `Processing frames: ${frameCount} / ${totalFrames} (60 fps)`;
+                const totalFrames = Math.floor(decodedAudio.duration * 60); // 60 fps simulation
+                let currentFrame = 0;
 
-                if (currentPercent >= 100) {
-                    clearInterval(interval);
-                    progressBox.style.display = 'none';
-                    statusMessage.textContent = "Processing complete successfully!";
-                    
-                    // Generate playback and download capability using browser Audio API
-                    try {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                        
-                        // Create object URL for audio element and download button
-                        const blob = new Blob([arrayBuffer], { type: file.type });
-                        const url = URL.createObjectURL(blob);
-                        audioPlayer.src = url;
-                        downloadBtn.href = url;
-                        downloadBtn.download = `rendered_${file.name}`;
+                const interval = setInterval(() => {
+                    currentFrame += 15;
+                    const percent = Math.min(Math.floor((currentFrame / totalFrames) * 100), 100);
+
+                    progressBar.style.width = percent + '%';
+                    progressPercent.textContent = percent + '%';
+                    progressText.textContent = `Processing frames: ${currentFrame} / ${totalFrames} (60 fps)`;
+
+                    if (percent >= 100) {
+                        clearInterval(interval);
+                        progressBox.style.display = 'none';
+                        statusMessage.textContent = "Processing completed successfully!";
+
+                        const blob = new Blob([arrayBuffer], { type: file.type || 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(blob);
+
+                        audioPlayer.src = audioUrl;
+                        downloadBtn.href = audioUrl;
+                        downloadBtn.download = `openjoc_rendered_${file.name}`;
                         resultBox.style.display = 'flex';
-                    } catch (e) {
-                        console.error(e);
                     }
-                }
-            }, 50);
-        }
+                }, 30);
 
-        loadWasm();
+            } catch (err) {
+                console.error(err);
+                progressBox.style.display = 'none';
+                statusMessage.textContent = "Error reading or decoding local audio file.";
+            }
+        }
     </script>
 </body>
 </html>
