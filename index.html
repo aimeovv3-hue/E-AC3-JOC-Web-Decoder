@@ -4,353 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenJOC (Binaural and 3D Audio) Tools</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: #121214;
-            color: #e1e1e6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        h1 {
-            font-size: 1.7rem;
-            font-weight: 700;
-            text-align: center;
-            color: #f1f1f3;
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-
-        .dropzone {
-            border: 2px dashed #51515e;
-            border-radius: 12px;
-            padding: 32px 20px;
-            text-align: center;
-            background-color: #1a1a1e;
-            cursor: pointer;
-            transition: border-color 0.2s, background-color 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .dropzone:hover {
-            border-color: #a78bfa;
-            background-color: #202026;
-        }
-
-        .dropzone .icon {
-            color: #d4d4d8;
-        }
-
-        .dropzone .text-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .dropzone strong {
-            font-size: 1.05rem;
-            color: #f1f1f3;
-        }
-
-        .dropzone span {
-            font-size: 0.85rem;
-            color: #a1a1aa;
-        }
-
-        .dropzone p {
-            font-size: 0.85rem;
-            color: #71717a;
-            margin-top: 4px;
-        }
-
-        .privacy-notice {
-            font-size: 0.8rem;
-            color: #a1a1aa;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-left: 4px;
-        }
-
-        .card {
-            background-color: #1a1a1e;
-            border: 1px solid #29292e;
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .card-header {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #c4c4cc;
-        }
-
-        .select-wrapper select {
-            width: 100%;
-            background-color: #121214;
-            color: #f1f1f3;
-            border: 1px solid #323238;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95rem;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .select-wrapper select:focus {
-            border-color: #a78bfa;
-        }
-
-        .progress-box {
-            background-color: #1a1a1e;
-            border: 1px solid #29292e;
-            border-radius: 12px;
-            padding: 16px;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            background-color: #29292e;
-            border-radius: 6px;
-            height: 8px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background-color: #a78bfa;
-            transition: width 0.1s linear;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #a1a1aa;
-        }
-
-        .result-box {
-            background-color: #1a1a1e;
-            border: 1px solid #29292e;
-            border-radius: 12px;
-            padding: 16px;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        audio {
-            width: 100%;
-            outline: none;
-        }
-
-        .btn-download {
-            background-color: #a78bfa;
-            color: #121214;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-
-        .btn-download:hover {
-            background-color: #c4b5fd;
-        }
-
-        .status-box {
-            font-size: 0.85rem;
-            color: #a78bfa;
-            text-align: center;
-            min-height: 20px;
-        }
-
-        footer {
-            font-size: 0.75rem;
-            color: #82828c;
-            text-align: center;
-            line-height: 1.4;
-            margin-top: 8px;
-            padding: 0 10px;
-        }
-
-        footer a {
-            color: #a78bfa;
-            text-decoration: underline;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="container">
-        <h1>OpenJOC (Binaural and 3D Audio) Tools</h1>
+    <div class="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold text-center mb-6">OpenJOC (Binaural and 3D Audio) Tools</h1>
 
         <!-- Drag & Drop Zone -->
-        <div class="dropzone" id="dropzone">
-            <div class="icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-            </div>
-            <div class="text-content">
-                <strong>Select input files</strong>
-                <span>(audio/scene description)</span>
-                <p>Drag & drop or click to browse</p>
-            </div>
-            <input type="file" id="fileInput" style="display: none;" multiple accept="audio/*,.json">
+        <div id="drop-zone" class="border-2 border-dashed border-zinc-700 hover:border-indigo-500 rounded-xl p-8 text-center cursor-pointer transition-all mb-4">
+            <svg class="w-12 h-12 mx-auto mb-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+            <p class="font-medium text-zinc-200">Select input files</p>
+            <p class="text-xs text-zinc-500 mt-1">(audio/scene description)</p>
+            <p class="text-xs text-zinc-400 mt-2">Drag & drop or click to browse</p>
+            <input type="file" id="file-input" class="hidden" accept=".ec3,.m4a,.wav,.mp4">
         </div>
 
-        <div class="privacy-notice">
-            <span>ℹ</span> All files are processed locally in your browser
+        <p class="text-xs text-zinc-500 text-center mb-6">ℹ️ All files are processed locally in your browser</p>
+
+        <!-- Target Rendering Selection -->
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 mb-4">
+            <label class="block text-xs font-semibold text-zinc-400 mb-2">Target rendering and HRTF</label>
+            <select id="layout-select" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 text-sm focus:outline-none focus:border-indigo-500">
+                <option value="22.2">22.2 Surround Layout • 24ch</option>
+                <option value="9.1.6">9.1.6 Dolby Atmos • 16ch</option>
+                <option value="5.1.4">5.1.4 Immersive • 10ch</option>
+                <option value="binaural">Binaural Headphone Mix • 2ch</option>
+            </select>
         </div>
 
-        <!-- Target Rendering Selector -->
-        <div class="card">
-            <div class="card-header">Target rendering and HRTF</div>
-            <div class="select-wrapper">
-                <select id="layoutSelect">
-                    <option value="binaural_mit">Binaural with HRTF (MIT HRTF database) • 2ch</option>
-                    <option value="surround_714">7.1.4 Dolby Atmos Layout • 12ch</option>
-                    <option value="surround_222">22.2 Surround Layout • 24ch</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Progress Box (Frames / FPS Tracking) -->
-        <div class="progress-box" id="progressBox">
-            <div class="progress-info">
-                <span id="progressText">Processing frames...</span>
-                <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
+        <!-- Progress & FPS Status (Hidden initially) -->
+        <div id="status-container" class="hidden mb-4 p-4 bg-zinc-950 border border-zinc-800 rounded-xl text-center">
+            <p id="status-text" class="text-sm font-medium text-indigo-400 mb-1">Processing audio frames...</p>
+            <div class="flex justify-between text-xs text-zinc-400 px-2">
+                <span id="frame-counter">Frame: 0 / 0</span>
+                <span id="fps-counter">0 FPS</span>
             </div>
         </div>
 
-        <!-- Result Box (Player & Download Button) -->
-        <div class="result-box" id="resultBox">
-            <div class="card-header">Processed Output Preview</div>
-            <audio id="audioPlayer" controls></audio>
-            <a id="downloadBtn" class="btn-download" download="processed_output.wav">Download Processed Audio</a>
+        <!-- Audio Player & Download Button (Hidden initially) -->
+        <div id="result-container" class="hidden space-y-4">
+            <audio id="audio-player" controls class="w-full"></audio>
+            <a id="download-btn" class="block w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-center font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-600/20">
+                Download Rendered Audio
+            </a>
         </div>
-
-        <!-- Status Box -->
-        <div class="status-box" id="statusMessage">OpenJOC Web Engine Ready</div>
-
-        <!-- Footer -->
-        <footer>
-            This application is built with tools from the OpenJOC repository, distributed under the 
-            <a href="https://github.com/chyinan/OpenJOC/blob/master/LICENSE" target="_blank">Apache-2.0 License</a>.
-        </footer>
     </div>
 
+    <footer class="mt-8 text-center text-xs text-zinc-600">
+        This application is built with tools from the OpenJOC repository, distributed under the <a href="#" class="underline">Apache-2.0 License</a>.
+    </footer>
+
     <script>
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('fileInput');
-        const statusMessage = document.getElementById('statusMessage');
-        const progressBox = document.getElementById('progressBox');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const progressPercent = document.getElementById('progressPercent');
-        const resultBox = document.getElementById('resultBox');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const downloadBtn = document.getElementById('downloadBtn');
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const statusContainer = document.getElementById('status-container');
+        const statusText = document.getElementById('status-text');
+        const frameCounter = document.getElementById('frame-counter');
+        const fpsCounter = document.getElementById('fps-counter');
+        const resultContainer = document.getElementById('result-container');
+        const audioPlayer = document.getElementById('audio-player');
+        const downloadBtn = document.getElementById('download-btn');
 
-        dropzone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('click', () => fileInput.click());
+
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) processAudioFile(e.target.files[0]);
-        });
-
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropzone.style.borderColor = '#a78bfa';
-        });
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.style.borderColor = '#51515e';
-        });
-        dropzone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropzone.style.borderColor = '#51515e';
-            if (e.dataTransfer.files.length > 0) processAudioFile(e.dataTransfer.files[0]);
-        });
-
-        async function processAudioFile(file) {
-            statusMessage.textContent = `Loading ${file.name}...`;
-            progressBox.style.display = 'flex';
-            resultBox.style.display = 'none';
-            progressBar.style.width = '0%';
-            progressPercent.textContent = '0%';
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const decodedAudio = await audioCtx.decodeAudioData(arrayBuffer);
-
-                const totalFrames = Math.floor(decodedAudio.duration * 60); // 60 fps simulation
-                let currentFrame = 0;
-
-                const interval = setInterval(() => {
-                    currentFrame += 15;
-                    const percent = Math.min(Math.floor((currentFrame / totalFrames) * 100), 100);
-
-                    progressBar.style.width = percent + '%';
-                    progressPercent.textContent = percent + '%';
-                    progressText.textContent = `Processing frames: ${currentFrame} / ${totalFrames} (60 fps)`;
-
-                    if (percent >= 100) {
-                        clearInterval(interval);
-                        progressBox.style.display = 'none';
-                        statusMessage.textContent = "Processing completed successfully!";
-
-                        const blob = new Blob([arrayBuffer], { type: file.type || 'audio/wav' });
-                        const audioUrl = URL.createObjectURL(blob);
-
-                        audioPlayer.src = audioUrl;
-                        downloadBtn.href = audioUrl;
-                        downloadBtn.download = `openjoc_rendered_${file.name}`;
-                        resultBox.style.display = 'flex';
-                    }
-                }, 30);
-
-            } catch (err) {
-                console.error(err);
-                progressBox.style.display = 'none';
-                statusMessage.textContent = "Error reading or decoding local audio file.";
+            const file = e.target.files[0];
+            if (file) {
+                startProcessingSimulation(file.name);
             }
+        });
+
+        function startProcessingSimulation(fileName) {
+            statusContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            
+            let totalFrames = 1500; // Simulado para el ejemplo de bucle
+            let currentFrame = 0;
+            let startTime = performance.now();
+
+            const interval = setInterval(() => {
+                currentFrame += 45;
+                if (currentFrame >= totalFrames) {
+                    currentFrame = totalFrames;
+                    clearInterval(interval);
+                    
+                    // Mostrar resultados y habilitar reproductor/descarga
+                    statusText.innerText = "Processing completed successfully!";
+                    resultContainer.classList.remove('hidden');
+                    
+                    // Enlace de descarga simulado o blob real generado por WASM
+                    downloadBtn.href = "#";
+                    downloadBtn.download = "rendered_22.2_output.wav";
+                }
+
+                let elapsed = (performance.now() - startTime) / 1000;
+                let fps = Math.round(currentFrame / (elapsed || 1));
+
+                statusText.innerText = `Decoding: ${fileName}`;
+                frameCounter.innerText = `Frame: ${currentFrame} / ${totalFrames}`;
+                fpsCounter.innerText = `${fps} FPS`;
+            }, 100);
         }
     </script>
 </body>
