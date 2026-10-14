@@ -1,44 +1,27 @@
-name: Build and Deploy OpenJOC Web
+name: Deploy OpenJOC Web Interface
 
 on:
   push:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  build-and-deploy:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Clone OpenJOC source code
-        run: |
-          git clone https://github.com/chyinan/OpenJOC.git openjoc_src
-
-      - name: Install Rust and WASM target
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          rustup target add wasm32-unknown-unknown
-
-      - name: Install wasm-pack
-        run: |
-          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Build OpenJOC to WebAssembly
-        run: |
-          cd openjoc_src
-          wasm-pack build --target web --release
-
-      - name: Organize output files
-        run: |
-          mkdir -p pkg
-          cp -r openjoc_src/pkg/* ./pkg/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
